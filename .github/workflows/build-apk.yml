@@ -1,4 +1,4 @@
-name: Build LIFE RPG Android APK
+name: Build LIFE RPG Android APK v0.4.0
 
 on:
   push:
@@ -37,48 +37,34 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Reconstruct and verify the original bundled web app
+      - name: Bundle the current LIFE RPG command center
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p app/src/main/assets
-          cat mobile/web_payload/part*.txt | tr -d '\r\n' > /tmp/life-rpg-payload.b64
-          echo "e961da8f60bfa025c3736c360940c97072236155ab77dae6ca013c4fdbe800fa  /tmp/life-rpg-payload.b64" | sha256sum --check
-          base64 --decode /tmp/life-rpg-payload.b64 | gzip --decompress --stdout > app/src/main/assets/index.html
-          echo "199fa2348dd40b1031a41303a591bae318afe63241bbfdfda48a53ea2b50798b  app/src/main/assets/index.html" | sha256sum --check
-
-      - name: Apply LIFE RPG v0.3.0 gameplay update
-        shell: bash
-        run: |
-          set -euo pipefail
-          base64 --decode mobile/patch_v030.py.gz.b64 | gzip --decompress > /tmp/patch_v030.py
-          python3 /tmp/patch_v030.py
-          echo "dcc18d57d05b95730af85e17a82e0d993ce4956816d434064031f353fa744af9  app/src/main/assets/index.html" | sha256sum --check
-
-      - name: Connect browser save exports to Android document picker
-        shell: bash
-        run: |
-          python3 - <<'PY'
+          cp life-rpg/index.html app/src/main/assets/index.html
+          test -s app/src/main/assets/index.html
+          node --check <(python3 - <<'PY'
           from pathlib import Path
-          path = Path("app/src/main/assets/index.html")
-          source = path.read_text(encoding="utf-8")
-          needle = "function download(name,content,type){const blob=new Blob([content],{type});"
-          replacement = 'function download(name,content,type){if(window.NativeBridge&&typeof window.NativeBridge.saveFile==="function"){window.NativeBridge.saveFile(name,type,String(content));return}const blob=new Blob([content],{type});'
-          if needle not in source:
-              raise SystemExit("Could not locate the app export function; refusing to patch an unexpected source.")
-          path.write_text(source.replace(needle, replacement, 1), encoding="utf-8")
+          import re
+          s = Path("life-rpg/index.html").read_text(encoding="utf-8")
+          m = re.search(r"<script>(.*?)</script>", s, re.S)
+          if not m:
+              raise SystemExit("No app script found")
+          print(m.group(1))
           PY
+          )
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
       - name: Name the install package
-        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.3.0.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.4.0.apk
 
       - name: Preserve the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LIFE-RPG-Android-v0.3.0
+          name: LIFE-RPG-Android-v0.4.0
           path: LIFE-RPG-Android-v0.3.0.apk
           if-no-files-found: error
           retention-days: 30
@@ -86,12 +72,12 @@ jobs:
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: life-rpg-v0.3.0
+          tag_name: life-rpg-v0.4.0
           target_commitish: main
-          name: LIFE RPG Android v0.3.0
+          name: LIFE RPG Android v0.4.0
           body: |
-            LIFE RPG v0.3.0 adds a playable daily quest loop, 10/20/30-minute sessions, a focus timer, and a preset weekday schedule.
-            This is a debug-signed offline APK. Progress is stored locally on-device; cloud sync is not included yet.
+            LIFE RPG v0.4.0 adds the Command Center dashboard, interactive quest log, persistent local XP, focus timer, weekly schedule, skills/evidence locker, data-connection status, and reward/control policy preview.
+            This is a debug-signed preview APK. Local progress is stored on-device. Google account sync, Gemini backend, cloud persistence, push notifications, and Windows control agent are not connected yet.
           files: LIFE-RPG-Android-v0.3.0.apk
           draft: false
           prerelease: false
