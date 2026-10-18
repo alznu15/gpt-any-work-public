@@ -1,4 +1,4 @@
-name: Build LIFE RPG Android APK v0.5.0
+name: Build LIFE RPG Android APK v0.5.1
 
 on:
   push:
@@ -60,26 +60,26 @@ jobs:
         run: gradle --no-daemon :app:assembleDebug
 
       - name: Name the install package
-        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.5.0.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.5.1.apk
 
       - name: Preserve the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LIFE-RPG-Android-v0.5.0
-          path: LIFE-RPG-Android-v0.5.0.apk
+          name: LIFE-RPG-Android-v0.5.1
+          path: LIFE-RPG-Android-v0.5.1.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: life-rpg-v0.5.0
+          tag_name: life-rpg-v0.5.1
           target_commitish: main
-          name: LIFE RPG Android v0.5.0
+          name: LIFE RPG Android v0.5.1
           body: |
-            LIFE RPG v0.5.0 adds Traditional Chinese localization, a persistent self-control skill level, daily behavior evidence logs, Newbie Village progression, and a level-10 stage transition trial, alongside the task log, timer, schedule and skills/evidence pages.
+            LIFE RPG v0.5.1 adds Traditional Chinese localization, a persistent self-control skill level, daily behavior evidence logs, Newbie Village progression, and a level-10 stage transition trial, alongside the task log, timer, schedule and skills/evidence pages.
             這是 debug 簽章的預覽 APK。進度保存在本機。Google 帳號同步、Gemini 後端、雲端資料庫、推播通知及 Windows 管控代理程式尚未接通。
-          files: LIFE-RPG-Android-v0.5.0.apk
+          files: LIFE-RPG-Android-v0.5.1.apk
           draft: false
           prerelease: false
           make_latest: true
