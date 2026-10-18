@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "status": "draft_rules",
+  "characterLevel": {
+    "baseXpToNextLevel": 100,
+    "increasePerLevel": 50,
+    "usage": "character progression only; never sufficient to unlock an academic or competition dungeon"
+  },
+  "xp": {
+    "focusBlockMinutes": 15,
+    "characterXpPerBlock": 8,
+    "skillXpPerBlock": 6,
+    "difficultyMultipliers": {
+      "1": 0.65,
+      "2": 0.8,
+      "3": 1,
+      "4": 1.25,
+      "5": 1.5
+    },
+    "evidenceMultipliers": {
+      "self_report": 0.5,
+      "artifact": 1,
+      "scored": 1.15,
+      "independently_verified": 1.25
+    },
+    "antiFarm": [
+      "Every focus minute can only be credited once.",
+      "Focus sessions cannot overlap.",
+      "An idempotency/session key prevents duplicate awards.",
+      "Skill XP is not equivalent to verified mastery.",
+      "Ability gates require passing a skill-specific benchmark."
+    ]
+  },
+  "difficultyIndex": {
+    "range": [0, 100],
+    "dimensionScale": [0, 5],
+    "weights": {
+      "prerequisiteKnowledge": 25,
+      "reasoningDepth": 25,
+      "transferNovelty": 20,
+      "timePressure": 15,
+      "breadth": 15
+    },
+    "competitiveSelectivityIsSeparate": true,
+    "unverifiedRatingsMustBeLabelledProvisional": true
+  },
+  "readiness": {
+    "eligibilityAndReadinessAreSeparate": true,
+    "maximumAllowedLevelGapForPreparationRecommendation": 1,
+    "defaultAssessmentFreshnessDays": 90,
+    "ineligibilityBlocksReadiness": true,
+    "readinessDoesNotOverrideOfficialRules": true
+  },
+  "aiDiscovery": {
+    "officialSourcePriority": 1,
+    "schoolDistrictUniversityGovernmentPriority": 2,
+    "aggregatorPriority": 3,
+    "communitySourcePriority": 4,
+    "unverifiedDatesCanNeverBePresentedAsConfirmed": true,
+    "externallySubmittingOrPayingRequiresUserApproval": true
+  }
+}
