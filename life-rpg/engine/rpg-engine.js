@@ -14,13 +14,14 @@
     scored: 1.15,
     independently_verified: 1.25
   });
-  const DIFFICULTY_WEIGHTS = Object.freeze({
-    prerequisiteKnowledge: 25,
-    reasoningDepth: 25,
-    transferNovelty: 20,
-    timePressure: 15,
-    breadth: 15
+  const DIFFICULTY_RUBRICS = Object.freeze({
+    cognitive: Object.freeze({ prerequisiteKnowledge: 25, reasoningDepth: 25, transferNovelty: 20, timePressure: 15, breadth: 15 }),
+    project: Object.freeze({ technicalComplexity: 25, scope: 20, uncertaintyNovelty: 20, crossDisciplinaryBreadth: 15, deadlinePressure: 10, communicationDeliverables: 10 }),
+    fitness: Object.freeze({ technique: 20, relativePhysicalDemand: 25, coordination: 15, duration: 15, precision: 15, recoveryDemand: 10 }),
+    creative: Object.freeze({ technique: 20, complexity: 20, executionQuality: 20, originality: 15, completeness: 15, presentation: 10 }),
+    team_leadership: Object.freeze({ coordination: 25, responsibility: 20, uncertainty: 20, impact: 20, followThrough: 15 })
   });
+  const DIFFICULTY_WEIGHTS = DIFFICULTY_RUBRICS.cognitive;
 
   function finiteNumber(value, fallback) {
     const n = Number(value);
@@ -68,22 +69,41 @@
     };
   }
 
-  function calculateDifficultyIndex(dimensions) {
+  function calculateDifficultyIndex(dimensions, rubricType) {
     const values = dimensions || {};
-    let total = 0;
+    const type = rubricType || values.rubricType || "cognitive";
+    const weights = DIFFICULTY_RUBRICS[type] || DIFFICULTY_RUBRICS.cognitive;
+    const keys = Object.keys(weights);
+    const missing = [];
+    let knownWeight = 0;
+    let knownPoints = 0;
     const breakdown = {};
-    Object.keys(DIFFICULTY_WEIGHTS).forEach(function (key) {
-      const rating = Math.max(0, Math.min(5, finiteNumber(values[key], 0)));
-      const points = (rating / 5) * DIFFICULTY_WEIGHTS[key];
+    keys.forEach(function (key) {
+      const raw = values[key];
+      const hasRating = raw !== undefined && raw !== null && raw !== "" && Number.isFinite(Number(raw));
+      if (!hasRating) {
+        missing.push(key);
+        breakdown[key] = null;
+        return;
+      }
+      const rating = Math.max(0, Math.min(5, Number(raw)));
+      const points = (rating / 5) * weights[key];
       breakdown[key] = Math.round(points * 10) / 10;
-      total += points;
+      knownWeight += weights[key];
+      knownPoints += points;
     });
+    const complete = missing.length === 0;
     return {
-      index: Math.round(total),
+      rubricType: type,
+      index: complete ? Math.round(knownPoints) : null,
+      provisionalIndex: knownWeight > 0 ? Math.round((knownPoints / knownWeight) * 100) : null,
+      ratingCompleteness: knownWeight,
+      missingDimensions: missing,
       max: 100,
       breakdown: breakdown,
+      ratingComplete: complete,
       ratingType: values.ratingType || "provisional",
-      note: "競爭選拔性與官方資格需分開計算，不包含在認知挑戰指數內。"
+      note: "只有所有必要維度均有評分時才產生正式指數；部分評分只顯示暫定估值。各類別有不同量規，競爭選拔性與官方資格另行計算。"
     };
   }
 
@@ -151,6 +171,7 @@
     difficultyMultipliers: DIFFICULTY_MULTIPLIERS,
     evidenceMultipliers: EVIDENCE_MULTIPLIERS,
     difficultyWeights: DIFFICULTY_WEIGHTS,
+    difficultyRubrics: DIFFICULTY_RUBRICS,
     calculateLevel: calculateLevel,
     calculateSessionReward: calculateSessionReward,
     calculateDifficultyIndex: calculateDifficultyIndex,
