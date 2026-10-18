@@ -44,3 +44,13 @@ test("ineligible candidates are never marked ready", () => {
   assert.equal(result.eligibility, "ineligible");
   assert.notEqual(result.readiness, "ready");
 });
+
+
+test("empty skill requirements are not treated as automatic readiness", () => {
+  const result = engine.evaluateDungeonGate(
+    { skills: {} },
+    { eligibilityStatus: "eligible", requiredSkills: [] },
+    "2026-10-18"
+  );
+  assert.equal(result.readiness, "requirements_not_configured");
+});
