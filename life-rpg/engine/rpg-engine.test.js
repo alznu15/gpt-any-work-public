@@ -26,7 +26,8 @@ test("difficulty index is weighted and bounded", () => {
     prerequisiteKnowledge: 5, reasoningDepth: 5, transferNovelty: 5, timePressure: 5, breadth: 5
   });
   assert.equal(result.index, 100);
-  assert.equal(engine.calculateDifficultyIndex({}).index, 0);
+  assert.equal(engine.calculateDifficultyIndex({}).index, null);
+  assert.equal(engine.calculateDifficultyIndex({}).ratingCompleteness, 0);
 });
 
 test("official eligibility remains separate from readiness", () => {
@@ -53,4 +54,30 @@ test("empty skill requirements are not treated as automatic readiness", () => {
     "2026-10-18"
   );
   assert.equal(result.readiness, "requirements_not_configured");
+});
+
+
+test("category-specific difficulty rubrics use distinct weighted dimensions", () => {
+  const project = engine.calculateDifficultyIndex({
+    technicalComplexity: 5,
+    scope: 5,
+    uncertaintyNovelty: 5,
+    crossDisciplinaryBreadth: 5,
+    deadlinePressure: 5,
+    communicationDeliverables: 5
+  }, "project");
+  assert.equal(project.index, 100);
+  assert.equal(project.rubricType, "project");
+  assert.equal(engine.difficultyRubrics.fitness.relativePhysicalDemand, 25);
+});
+
+test("partial difficulty evidence cannot masquerade as a complete index", () => {
+  const partial = engine.calculateDifficultyIndex({
+    prerequisiteKnowledge: 4,
+    reasoningDepth: 3
+  }, "cognitive");
+  assert.equal(partial.index, null);
+  assert.equal(partial.ratingComplete, false);
+  assert.ok(partial.provisionalIndex !== null);
+  assert.ok(partial.missingDimensions.includes("breadth"));
 });
