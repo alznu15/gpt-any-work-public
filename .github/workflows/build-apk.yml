@@ -76,7 +76,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: life-rpg-v0.2.0
-          target_commitish: \${{ github.sha }}
+          target_commitish: main
           name: LIFE RPG Android v0.2.0
           body: |
             LIFE RPG offline Android app, built from this repository.
