@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: LIFE-RPG-Android-v0.4.0
-          path: LIFE-RPG-Android-v0.3.0.apk
+          path: LIFE-RPG-Android-v0.4.0.apk
           if-no-files-found: error
           retention-days: 30
 
