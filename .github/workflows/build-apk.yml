@@ -56,6 +56,9 @@ jobs:
           PY
           node --check /tmp/life-rpg.js
 
+      - name: Test LIFE RPG scoring and challenge rules
+        run: node --test life-rpg/engine/rpg-engine.test.js
+
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
