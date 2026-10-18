@@ -1,0 +1,14 @@
+{
+  "name": "LIFE RPG · Personal Operating System",
+  "short_name": "LIFE RPG",
+  "description": "Daily command center, quests, schedule, skills and reward control.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
