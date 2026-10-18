@@ -1,0 +1,89 @@
+name: Build LIFE RPG Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "platforms;android-35 build-tools;35.0.0"
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "8.9"
+
+      - name: Reconstruct and verify the bundled web app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p app/src/main/assets
+          cat mobile/web_payload/part*.txt | tr -d '\r\n' > /tmp/life-rpg-payload.b64
+          echo "e961da8f60bfa025c3736c360940c97072236155ab77dae6ca013c4fdbe800fa  /tmp/life-rpg-payload.b64" | sha256sum --check
+          base64 --decode /tmp/life-rpg-payload.b64 | gzip --decompress --stdout > app/src/main/assets/index.html
+          echo "199fa2348dd40b1031a41303a591bae318afe63241bbfdfda48a53ea2b50798b  app/src/main/assets/index.html" | sha256sum --check
+
+      - name: Connect browser save exports to Android document picker
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("app/src/main/assets/index.html")
+          source = path.read_text(encoding="utf-8")
+          needle = "function download(name,content,type){const blob=new Blob([content],{type});"
+          replacement = 'function download(name,content,type){if(window.NativeBridge&&typeof window.NativeBridge.saveFile==="function"){window.NativeBridge.saveFile(name,type,String(content));return}const blob=new Blob([content],{type});'
+          if needle not in source:
+              raise SystemExit("Could not locate the app export function; refusing to patch an unexpected source.")
+          path.write_text(source.replace(needle, replacement, 1), encoding="utf-8")
+          PY
+
+      - name: Build debug APK
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Name the install package
+        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.2.0.apk
+
+      - name: Preserve the APK as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIFE-RPG-Android-v0.2.0
+          path: LIFE-RPG-Android-v0.2.0.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: life-rpg-v0.2.0
+          target_commitish: \${{ github.sha }}
+          name: LIFE RPG Android v0.2.0
+          body: |
+            LIFE RPG offline Android app, built from this repository.
+            This is a debug-signed APK for direct installation. The current build stores progress locally on the device; cloud sync is not included yet.
+          files: LIFE-RPG-Android-v0.2.0.apk
+          draft: false
+          prerelease: false
+          make_latest: true
+          overwrite_files: true
+          fail_on_unmatched_files: true
