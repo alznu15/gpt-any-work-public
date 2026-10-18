@@ -44,16 +44,16 @@ jobs:
           mkdir -p app/src/main/assets
           cp life-rpg/index.html app/src/main/assets/index.html
           test -s app/src/main/assets/index.html
-          node --check <(python3 - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
           import re
           s = Path("life-rpg/index.html").read_text(encoding="utf-8")
           m = re.search(r"<script>(.*?)</script>", s, re.S)
           if not m:
               raise SystemExit("No app script found")
-          print(m.group(1))
+          Path("/tmp/life-rpg.js").write_text(m.group(1), encoding="utf-8")
           PY
-          )
+          node --check /tmp/life-rpg.js
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
