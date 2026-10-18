@@ -34,13 +34,48 @@
   "difficultyIndex": {
     "range": [0, 100],
     "dimensionScale": [0, 5],
-    "weights": {
-      "prerequisiteKnowledge": 25,
-      "reasoningDepth": 25,
-      "transferNovelty": 20,
-      "timePressure": 15,
-      "breadth": 15
+    "rubrics": {
+      "cognitive": {
+        "prerequisiteKnowledge": 25,
+        "reasoningDepth": 25,
+        "transferNovelty": 20,
+        "timePressure": 15,
+        "breadth": 15
+      },
+      "project": {
+        "technicalComplexity": 25,
+        "scope": 20,
+        "uncertaintyNovelty": 20,
+        "crossDisciplinaryBreadth": 15,
+        "deadlinePressure": 10,
+        "communicationDeliverables": 10
+      },
+      "fitness": {
+        "technique": 20,
+        "relativePhysicalDemand": 25,
+        "coordination": 15,
+        "duration": 15,
+        "precision": 15,
+        "recoveryDemand": 10
+      },
+      "creative": {
+        "technique": 20,
+        "complexity": 20,
+        "executionQuality": 20,
+        "originality": 15,
+        "completeness": 15,
+        "presentation": 10
+      },
+      "team_leadership": {
+        "coordination": 25,
+        "responsibility": 20,
+        "uncertainty": 20,
+        "impact": 20,
+        "followThrough": 15
+      }
     },
+    "allRequiredDimensionsNeededForFinalScore": true,
+    "partialRatingsRemainProvisional": true,
     "competitiveSelectivityIsSeparate": true,
     "unverifiedRatingsMustBeLabelledProvisional": true
   },
