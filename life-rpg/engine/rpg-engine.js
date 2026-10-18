@@ -100,6 +100,9 @@
 
     const skills = p.skills || {};
     const requirements = d.requiredSkills || [];
+    if (requirements.length === 0) {
+      return { eligibility: "eligible", readiness: "requirements_not_configured", reasons: ["此機會尚未建立經核實的技能門檻；不可單憑空白需求判定為已準備完成"] };
+    }
     const missingBy = [];
     const lowScore = [];
     const stale = [];
