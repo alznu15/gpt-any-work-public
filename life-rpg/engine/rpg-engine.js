@@ -147,6 +147,20 @@
       }
     });
 
+    const unevaluated = requirements.filter(function (req) {
+      const actual = skills[req.skillId] || {};
+      return !actual.lastAssessedAt || actual.verifiedLevel === undefined || actual.verifiedLevel === null;
+    });
+    if (unevaluated.length) {
+      return {
+        eligibility: "eligible",
+        readiness: "assessment_needed",
+        reasons: ["缺少至少一項先備技能的基準測驗，無法僅憑未知資料判定已鎖定或已準備完成"],
+        unassessedSkills: unevaluated.map(function (req) { return req.skillId; }),
+        missingBy: missingBy
+      };
+    }
+
     const largeGaps = missingBy.filter(function (item) { return item.levels > 1; });
     if (largeGaps.length) {
       return { eligibility: "eligible", readiness: "locked_by_prerequisite_gap", reasons: ["至少一項先備技能低於需求兩級或以上"], missingBy: missingBy, staleSkills: stale, lowScoreSkills: lowScore };
