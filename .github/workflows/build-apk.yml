@@ -1,4 +1,4 @@
-name: Build LIFE RPG Android APK v0.6.0
+name: Build LIFE RPG Android APK v0.6.1
 
 on:
   push:
@@ -67,26 +67,26 @@ jobs:
         run: gradle --no-daemon :app:assembleDebug
 
       - name: Name the install package
-        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.6.0.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.6.1.apk
 
       - name: Preserve the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LIFE-RPG-Android-v0.6.0
-          path: LIFE-RPG-Android-v0.6.0.apk
+          name: LIFE-RPG-Android-v0.6.1
+          path: LIFE-RPG-Android-v0.6.1.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: life-rpg-v0.6.0
+          tag_name: life-rpg-v0.6.1
           target_commitish: main
-          name: LIFE RPG Android v0.6.0
+          name: LIFE RPG Android v0.6.1
           body: |
-            LIFE RPG v0.6.0 adds Traditional Chinese localization, a persistent self-control skill level, daily behavior evidence logs, Newbie Village progression, and a level-10 stage transition trial, alongside the task log, timer, schedule and skills/evidence pages.
-            這是 debug 簽章的試用 APK。XP 依專注時段、難度與證據倍率計算；副本目錄為附來源的靜態樣本，基準測驗屬本機暫估。即時 AI 搜尋、AI 批改、Google 同步、雲端資料庫與 Windows 管控代理程式尚未接通。進度保存在本機。
-          files: LIFE-RPG-Android-v0.6.0.apk
+            LIFE RPG v0.6.1 makes the updated XP rules visible in the app and adds a searchable opportunity/dungeon atlas, provisional skill-benchmark recording, readiness estimates, score reporting, printable challenge cards, versioned cache assets, and a visible build label.
+            這是 debug 簽章的試用 APK。任務勾選不直接發 XP；XP 依專注時間、難度、完成比例與成果證據計算。副本目錄為 11 筆附來源的靜態樣本，技能基準是本機暫估。即時 AI 搜尋、AI 批改、Google 同步、雲端資料庫與 Windows 管控代理程式尚未接通。進度保存在本機。
+          files: LIFE-RPG-Android-v0.6.1.apk
           draft: false
           prerelease: false
           make_latest: true
