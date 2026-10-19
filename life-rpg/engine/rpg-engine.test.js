@@ -81,3 +81,14 @@ test("partial difficulty evidence cannot masquerade as a complete index", () => 
   assert.ok(partial.provisionalIndex !== null);
   assert.ok(partial.missingDimensions.includes("breadth"));
 });
+
+
+test("missing skill evidence requests an assessment instead of declaring a confirmed lock", () => {
+  const result = engine.evaluateDungeonGate(
+    { skills: {} },
+    { eligibilityStatus: "eligible", requiredSkills: [{ skillId: "geometry", minVerifiedLevel: 3 }] },
+    "2026-10-18"
+  );
+  assert.equal(result.readiness, "assessment_needed");
+  assert.deepEqual(result.unassessedSkills, ["geometry"]);
+});
