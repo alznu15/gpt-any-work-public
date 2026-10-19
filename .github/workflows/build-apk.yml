@@ -1,4 +1,4 @@
-name: Build LIFE RPG Android APK v0.5.1
+name: Build LIFE RPG Android APK v0.6.0
 
 on:
   push:
@@ -42,9 +42,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p app/src/main/assets
+          mkdir -p app/src/main/assets/engine app/src/main/assets/data
           cp life-rpg/index.html app/src/main/assets/index.html
+          cp life-rpg/engine/rpg-engine.js app/src/main/assets/engine/rpg-engine.js
+          cp life-rpg/data/opportunities-seed.js app/src/main/assets/data/opportunities-seed.js
           test -s app/src/main/assets/index.html
+          test -s app/src/main/assets/engine/rpg-engine.js
+          test -s app/src/main/assets/data/opportunities-seed.js
           python3 - <<'PY'
           from pathlib import Path
           import re
@@ -59,30 +63,33 @@ jobs:
       - name: Test LIFE RPG scoring and challenge rules
         run: node --test life-rpg/engine/rpg-engine.test.js
 
+      - name: Test LIFE RPG scoring and challenge rules
+        run: node --test life-rpg/engine/rpg-engine.test.js
+
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
       - name: Name the install package
-        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.5.1.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk LIFE-RPG-Android-v0.6.0.apk
 
       - name: Preserve the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LIFE-RPG-Android-v0.5.1
-          path: LIFE-RPG-Android-v0.5.1.apk
+          name: LIFE-RPG-Android-v0.6.0
+          path: LIFE-RPG-Android-v0.6.0.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: life-rpg-v0.5.1
+          tag_name: life-rpg-v0.6.0
           target_commitish: main
-          name: LIFE RPG Android v0.5.1
+          name: LIFE RPG Android v0.6.0
           body: |
-            LIFE RPG v0.5.1 adds Traditional Chinese localization, a persistent self-control skill level, daily behavior evidence logs, Newbie Village progression, and a level-10 stage transition trial, alongside the task log, timer, schedule and skills/evidence pages.
-            這是 debug 簽章的預覽 APK。進度保存在本機。Google 帳號同步、Gemini 後端、雲端資料庫、推播通知及 Windows 管控代理程式尚未接通。
-          files: LIFE-RPG-Android-v0.5.1.apk
+            LIFE RPG v0.6.0 adds Traditional Chinese localization, a persistent self-control skill level, daily behavior evidence logs, Newbie Village progression, and a level-10 stage transition trial, alongside the task log, timer, schedule and skills/evidence pages.
+            這是 debug 簽章的試用 APK。XP 依專注時段、難度與證據倍率計算；副本目錄為附來源的靜態樣本，基準測驗屬本機暫估。即時 AI 搜尋、AI 批改、Google 同步、雲端資料庫與 Windows 管控代理程式尚未接通。進度保存在本機。
+          files: LIFE-RPG-Android-v0.6.0.apk
           draft: false
           prerelease: false
           make_latest: true
